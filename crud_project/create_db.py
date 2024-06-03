@@ -1,5 +1,8 @@
-from models import Item
-from database import Base,engine
-print("creating database is successfully")
+# create_db.py
+from models import Item, Patient
+from database import Base, engine
 
-Base.metadata.create_all(engine)
+print("Creating database tables...")
+Base.metadata.create_all(bind=engine)
+print("Tables created successfully")
+

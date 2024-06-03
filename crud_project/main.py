@@ -106,12 +106,15 @@
 
 
 
+#Data Validation: Ensures incoming data matches the expected types and structure.
+#Data Serialization: Converts complex data types (like database models) into JSON format for HTTP responses
+
 from fastapi import FastAPI, Depends, status, HTTPException
 from pydantic import BaseModel
 from typing import List
 from database import SessionLocal
 from sqlalchemy.orm import Session
-
+from models import Patient
 import crud
 
 app = FastAPI()
@@ -133,7 +136,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
+ 
 @app.get('/items', response_model=List[Item], status_code=200)
 def get_all_items(db: Session = Depends(get_db)):
     return crud.get_all_items(db)
@@ -155,6 +158,59 @@ def update_an_item(item_id: int, updated_item: Item, db: Session = Depends(get_d
 def delete_an_item(item_id: int, db: Session = Depends(get_db)):
     return crud.delete_an_item(db, item_id)
 
+# class Address(BaseModel):
+#     street: str
+#     city: str
+#     state: str
+#     zipcode: str
+
+# class Name(BaseModel):
+#     first_name: str
+#     last_name: str
+
+# class Contact(BaseModel):
+#     phone: str
+#     email: str
+
+# class MedicalHistory(BaseModel):
+#     conditions: List[str]
+#     medications: List[str]
+#     allergies: List[str]
+
+# class Patient_response(BaseModel):
+#     patient_id: str
+#     name: Name
+#     age: int
+#     gender: str
+#     contact: Contact
+#     address: Address
+#     medical_history: MedicalHistory
+from Schemas import Patient_response
+@app.post('/patients/', status_code=status.HTTP_201_CREATED, response_model=Patient_response)
+def create_patient(patient_data: Patient_response, db: Session = Depends(get_db)):
+    patient_dict = patient_data.dict()
+    print("converting into dict\n",patient_dict)
+    patient = crud.create_patient(db, patient_dict)
+    return patient
+
+@app.get('/patients/',status_code=200,response_model=List[Patient_response])
+def get_all_patient(db:Session=Depends(get_db)):
+    return crud.get_all_patient(db)
+
+@app.get('/patients/{patient_id}', response_model=Patient_response, status_code=200)
+def read_patient(patient_id: str, db: Session = Depends(get_db)):
+    patient = crud.get_patient_by_id(db, patient_id)
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return patient
+
+
+@app.put('/patients/{patient_id}',response_model=Patient_response,status_code=200)
+def update_patient(patient_id: str,update_body:Patient_response,db:Session=Depends(get_db)):
+    return crud.update_patient(db,patient_id,update_body)
+@app.delete('/patient/{patient_id}',status_code=201)
+def patient_delete(patient_id:str,db:Session=Depends(get_db)):
+    return crud.delete_patient(db,patient_id)
 
 
 

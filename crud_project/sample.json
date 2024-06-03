@@ -1,0 +1,32 @@
+{
+    "patient_id": "99979",
+    "name": {
+        "first_name": "abcd",
+        "last_name": "Doe"
+    },
+    "age": 35,
+    "gender": "M",
+    "contact": {
+        "phone": "123-456-7890",
+        "email": "john.doe@example.com"
+    },
+    "address": {
+        "street": "123 Main St",
+        "city": "abcdefshd",
+        "state": null,
+        "zipcode": "24738049"
+    },
+    "medical_history": {
+        "conditions": [
+            "Hypertension",
+            "Diabetes"
+        ],
+        "medications": [
+            "Lisinopril",
+            "Metformin"
+        ],
+        "allergies": [
+            "hbskjcneivns"
+        ]
+    }
+}
