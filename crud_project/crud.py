@@ -97,9 +97,9 @@ from typing import Dict
 #     db.refresh(patient)
 #     return patient
 
+#for creating the patient data 
 def create_patient(db: Session, patient_data: Dict) -> Patient:
     try:
-
         patient = Patient(**patient_data)#Patient(**patient_data) is a shorthand way to pass all the dictionary key-value pairs as keyword arguments to the Patient constructor.
         print("patient_data\n",patient)
         print("----------")
@@ -137,18 +137,18 @@ def update_patient(db:Session,patien_id:int,patient_data:Patient)->Patient:
         print("key------\n",key,"\n","value====\n",value)
         if value is not None:
             print("patient-----\n",patient)
-            print("data update---\n",setattr(patient, key, value))#this will helps 
+            print("data update---\n",setattr(patient, key, value))#this will helps set the data for what we update in the json
     db.commit()
     db.refresh(patient)
     return patient
 
 #delete patient with patient_id
 def delete_patient(db:Session,patient_id=str):
-    patient_delete=db.query(Patient).filter(Patient.patient_id==patient_id).all()
+    patient_delete=db.query(Patient).filter(Patient.patient_id==patient_id).all()#if you want delete one data gives first()
 
     if patient_delete is None:
         raise HTTPException(status_code=400,detail="patient_id not found")
-    for patient in patient_delete:
+    for patient in patient_delete:#no need the loop for deleting the one data
         db.delete(patient)
     db.commit()
     return {"message":f"the patient is deleted with {patient_id} patient id"}

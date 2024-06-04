@@ -193,10 +193,12 @@ def create_patient(patient_data: Patient_response, db: Session = Depends(get_db)
     patient = crud.create_patient(db, patient_dict)
     return patient
 
+#for getting all the data of the patient
 @app.get('/patients/',status_code=200,response_model=List[Patient_response])
 def get_all_patient(db:Session=Depends(get_db)):
     return crud.get_all_patient(db)
 
+#for getting the  patient data with patient id
 @app.get('/patients/{patient_id}', response_model=Patient_response, status_code=200)
 def read_patient(patient_id: str, db: Session = Depends(get_db)):
     patient = crud.get_patient_by_id(db, patient_id)
@@ -204,10 +206,12 @@ def read_patient(patient_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Patient not found")
     return patient
 
-
+#for update the patient
 @app.put('/patients/{patient_id}',response_model=Patient_response,status_code=200)
 def update_patient(patient_id: str,update_body:Patient_response,db:Session=Depends(get_db)):
     return crud.update_patient(db,patient_id,update_body)
+
+#for delete the patient data
 @app.delete('/patient/{patient_id}',status_code=201)
 def patient_delete(patient_id:str,db:Session=Depends(get_db)):
     return crud.delete_patient(db,patient_id)
