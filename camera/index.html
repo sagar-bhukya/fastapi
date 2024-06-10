@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Capture</title>
+</head>
+<body>
+    <h1>Camera Capture</h1>
+    <button id="openCamera">Open Camera</button>
+    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <button id="capture" style="display:none;">Capture</button>
+    <button id="upload" style="display:none;">Upload</button>
+
+    <script>
+        const openCameraButton = document.getElementById('openCamera');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const uploadButton = document.getElementById('upload');
+
+        let context = canvas.getContext('2d');
+
+        openCameraButton.addEventListener('click', () => {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.play();
+                    video.style.display = 'block';
+                    captureButton.style.display = 'block';
+                })
+                .catch((err) => {
+                    console.error(`An error occurred: ${err}`);
+                });
+        });
+
+        captureButton.addEventListener('click', () => {
+            context.drawImage(video, 0, 0, 640, 480);
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+            captureButton.style.display = 'none';
+            uploadButton.style.display = 'block';
+        });
+
+        uploadButton.addEventListener('click', () => {
+            canvas.toBlob((blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'photo.png');
+
+                console.log('Uploading file...');
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('Upload response status:', response.status);
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Upload failed with status ' + response.status);
+                    }
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Upload successful!');
+                })
+                .catch((error) => {
+                    console.error('Upload failed:', error);
+                    alert('Upload failed.');
+                });
+            }, 'image/png');
+        });
+    </script>
+</body>
+</html>
